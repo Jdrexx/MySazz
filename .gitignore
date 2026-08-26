@@ -8,3 +8,6 @@ storage/uploads/*
 !storage/uploads/.gitkeep
 .env
 .DS_Store
+.procoder/state/
+.procoder/index/
+.lycheecache
