@@ -1,6 +1,7 @@
 # MySazz Community
 
 [![CI](https://github.com/Jdrexx/SocialMediaMVP/actions/workflows/ci.yml/badge.svg)](https://github.com/Jdrexx/SocialMediaMVP/actions/workflows/ci.yml)
+![Version](https://img.shields.io/badge/version-0.1.0-blue)
 
 MySazz is becoming a private, safety-first community for adults moving forward with lived experience. The product combines member stories, intentional connections, private conversation, peer support, and trustworthy local resource navigation.
 
@@ -230,6 +231,7 @@ tests/                       API, privacy, safety, persistence, and realtime tes
 ## Documentation
 
 - [Architecture](docs/ARCHITECTURE.md)
+- [Project roadmap report](docs/MYSAZZ_PROJECT_ROADMAP_REPORT.md)
 - [AI Resource Navigator](docs/AI_RESOURCE_NAVIGATOR.md)
 - [Security and privacy status](docs/SECURITY.md)
 - [Deployment readiness](docs/DEPLOYMENT_READY.md)
