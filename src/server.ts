@@ -26,7 +26,8 @@ async function registerNextFrontend() {
   const nextApp = next({ dev: config.nodeEnv !== "production" });
   const handle = nextApp.getRequestHandler();
   await nextApp.prepare();
-  app.all("*", (req, res) => handle(req, res));
+  // Express 5: '*' is no longer a valid route path — '*splat' is the named form.
+  app.all("*splat", (req, res) => handle(req, res));
 }
 
 await registerNextFrontend();
