@@ -81,6 +81,8 @@ Add more shared dependencies to `context` only when needed.
 
 ## Production notes
 
+- Express 5: route wildcards must be named (`/api/*splat`, `*splat`) — the Express 4 `*` / `/api/*` forms throw at mount (path-to-regexp v8). Both `src/server.ts` (Next.js frontend catch-all) and `src/app.ts` (API 404) use the named form.
+- Realtime is Socket.IO only; the legacy SSE stub (`/api/messages/stream`) was removed.
 - `src/lib/env.js` rejects weak production config before the server starts.
 - Cookies become secure in production.
 - SMTP is real when `SMTP_HOST`, `SMTP_USER`, and `SMTP_PASS` are set.
