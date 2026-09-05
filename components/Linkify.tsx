@@ -6,9 +6,13 @@ export default function Linkify({ text }) {
   return (
     <>
       {parts.map((part, i) => {
-        if (part.startsWith('#')) {
+        if (part.startsWith("#")) {
           const tag = encodeURIComponent(part);
-          return <a key={i} href={`/search?q=${tag}`} className="hashtag">{part}</a>;
+          return (
+            <a key={i} href={`/search?q=${tag}`} className="hashtag">
+              {part}
+            </a>
+          );
         }
         return part;
       })}

@@ -1,11 +1,11 @@
 // @ts-nocheck
-'use client';
+"use client";
 
-import { api } from './api';
+import { api } from "./api";
 
 export default function NotificationsPanel({ notifications, onRefresh }) {
   async function markAllRead() {
-    await api('/api/notifications/read-all', { method: 'POST' });
+    await api("/api/notifications/read-all", { method: "POST" });
     onRefresh();
   }
 
@@ -14,10 +14,12 @@ export default function NotificationsPanel({ notifications, onRefresh }) {
       <h2>Notifications</h2>
       <div className="inline">
         <button onClick={onRefresh}>Refresh</button>
-        <button onClick={markAllRead} className="secondaryButton">Mark all read</button>
+        <button onClick={markAllRead} className="secondaryButton">
+          Mark all read
+        </button>
       </div>
       {notifications.map((n) => (
-        <p key={n.id} className={!n.read_at ? 'unread' : ''}>
+        <p key={n.id} className={!n.read_at ? "unread" : ""}>
           {n.body}
         </p>
       ))}

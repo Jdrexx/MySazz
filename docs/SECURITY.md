@@ -4,19 +4,19 @@ This is an implementation status document, not a certification. MySazz handles l
 
 ## Data inventory
 
-| Data | Storage | Exposure |
-|---|---|---|
-| Email | Plaintext database field | Account owner and admins |
-| Password | bcrypt cost-12 hash | Never returned by the API |
-| TOTP secret | AES-256-GCM application encryption | Server-side authentication flow |
-| Private messages | AES-256-GCM application encryption | The two connected members; server can decrypt |
-| Lived-experience tags | Plaintext database field | Hidden from members unless the owner opts in; server/admin storage still contains them |
-| Relationship status | Plaintext database field | Hidden from members unless the owner opts in |
-| ZIP/postal code | Plaintext database field | Account owner/API internals only |
-| City/region | Plaintext database field | Visible to authenticated members for discoverable profiles |
-| Posts/comments | Plaintext database fields | Authenticated members, subject to block/moderation rules |
-| Media | Private filesystem path | Authenticated `/uploads` route; possession of a URL is not per-recipient authorization |
-| Consent records | Versioned database rows | Account owner export and server/admin storage |
+| Data                  | Storage                            | Exposure                                                                               |
+| --------------------- | ---------------------------------- | -------------------------------------------------------------------------------------- |
+| Email                 | Plaintext database field           | Account owner and admins                                                               |
+| Password              | bcrypt cost-12 hash                | Never returned by the API                                                              |
+| TOTP secret           | AES-256-GCM application encryption | Server-side authentication flow                                                        |
+| Private messages      | AES-256-GCM application encryption | The two connected members; server can decrypt                                          |
+| Lived-experience tags | Plaintext database field           | Hidden from members unless the owner opts in; server/admin storage still contains them |
+| Relationship status   | Plaintext database field           | Hidden from members unless the owner opts in                                           |
+| ZIP/postal code       | Plaintext database field           | Account owner/API internals only                                                       |
+| City/region           | Plaintext database field           | Visible to authenticated members for discoverable profiles                             |
+| Posts/comments        | Plaintext database fields          | Authenticated members, subject to block/moderation rules                               |
+| Media                 | Private filesystem path            | Authenticated `/uploads` route; possession of a URL is not per-recipient authorization |
+| Consent records       | Versioned database rows            | Account owner export and server/admin storage                                          |
 
 Message and TOTP encryption is **not end-to-end encryption**. The application holds `DATA_ENCRYPTION_KEY` and can decrypt those records. Back up this key separately; losing it makes encrypted data unreadable.
 

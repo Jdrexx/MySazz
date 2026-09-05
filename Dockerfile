@@ -9,6 +9,10 @@ COPY . .
 
 RUN npm run frontend:build
 
+# Run as an unprivileged user — the node image ships one.
+RUN chown -R node:node /app && mkdir -p /data && chown -R node:node /data
+USER node
+
 EXPOSE 3000
 
 ENV NODE_ENV=production \

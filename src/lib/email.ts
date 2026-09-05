@@ -1,6 +1,6 @@
 // @ts-nocheck
-import nodemailer from 'nodemailer';
-import { hasSmtpConfig } from './env';
+import nodemailer from "nodemailer";
+import { hasSmtpConfig } from "./env";
 
 function resetHtml({ username, link }) {
   return `<p>Hi ${username},</p><p>Use this secure link to reset your password:</p><p><a href="${link}">${link}</a></p><p>This link expires in 1 hour.</p>`;
@@ -17,13 +17,16 @@ export function createEmailService(config) {
         host: config.smtp.host,
         port: config.smtp.port,
         secure: config.smtp.secure,
-        auth: { user: config.smtp.user, pass: config.smtp.pass }
+        auth: { user: config.smtp.user, pass: config.smtp.pass },
       })
     : null;
 
   async function sendMail(message) {
     if (!enabled) {
-      return { sent: false, reason: 'SMTP is not configured; dev_token returned for local testing.' };
+      return {
+        sent: false,
+        reason: "SMTP is not configured; dev_token returned for local testing.",
+      };
     }
     await transporter.sendMail({ from: config.smtp.from, ...message });
     return { sent: true };
@@ -35,19 +38,19 @@ export function createEmailService(config) {
       const link = `${config.publicUrl}/reset-password?token=${encodeURIComponent(token)}`;
       return sendMail({
         to: user.email,
-        subject: 'Reset your MySazz password',
+        subject: "Reset your MySazz password",
         text: `Reset your password: ${link}`,
-        html: resetHtml({ username: user.username, link })
+        html: resetHtml({ username: user.username, link }),
       });
     },
     async sendEmailVerification(user, token) {
       const link = `${config.publicUrl}/verify-email?token=${encodeURIComponent(token)}`;
       return sendMail({
         to: user.email,
-        subject: 'Verify your MySazz email',
+        subject: "Verify your MySazz email",
         text: `Verify your email: ${link}`,
-        html: verifyHtml({ username: user.username, link })
+        html: verifyHtml({ username: user.username, link }),
       });
-    }
+    },
   };
 }

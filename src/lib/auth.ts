@@ -1,5 +1,5 @@
-import crypto from 'node:crypto';
-import jwt from 'jsonwebtoken';
+import crypto from "node:crypto";
+import jwt from "jsonwebtoken";
 
 export function publicUser(user) {
   if (!user) return null;
@@ -12,7 +12,7 @@ export function publicUser(user) {
     email_verified: Boolean(user.email_verified),
     is_admin: Boolean(user.is_admin),
     is_suspended: Boolean(user.is_suspended),
-    created_at: user.created_at
+    created_at: user.created_at,
   };
 }
 
@@ -27,49 +27,62 @@ export function ownUser(user) {
 }
 
 export function createToken() {
-  return crypto.randomBytes(32).toString('hex');
+  return crypto.randomBytes(32).toString("hex");
 }
 
 export function hashToken(token) {
-  return crypto.createHash('sha256').update(token).digest('hex');
+  return crypto.createHash("sha256").update(token).digest("hex");
 }
 
 export function signToken(user, secret) {
-  return jwt.sign({ sub: String(user.id), username: user.username }, secret, { expiresIn: '7d', issuer: 'social-media-mvp' });
-}
-
-export function setAuthCookie(res, token, { secure = false } = {}) {
-  res.cookie('token', token, {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure,
-    maxAge: 7 * 24 * 60 * 60 * 1000
+  return jwt.sign({ sub: String(user.id), username: user.username }, secret, {
+    expiresIn: "7d",
+    issuer: "social-media-mvp",
   });
 }
 
-export function getTokenFromCookieHeader(cookieHeader = '') {
+export function setAuthCookie(res, token, { secure = false } = {}) {
+  res.cookie("token", token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+}
+
+export function getTokenFromCookieHeader(cookieHeader = "") {
   return cookieHeader
-    .split(';')
+    .split(";")
     .map((part) => part.trim())
-    .find((part) => part.startsWith('token='))
-    ?.slice('token='.length);
+    .find((part) => part.startsWith("token="))
+    ?.slice("token=".length);
 }
 
 export async function getUserFromToken(token, db, jwtSecret) {
   if (!token) return null;
   try {
-    const payload = jwt.verify(token, jwtSecret, { issuer: 'social-media-mvp' });
-    return await db.get('SELECT * FROM users WHERE id = ?', Number(payload.sub));
+    const payload = jwt.verify(token, jwtSecret, {
+      issuer: "social-media-mvp",
+    });
+    return await db.get(
+      "SELECT * FROM users WHERE id = ?",
+      Number(payload.sub),
+    );
   } catch {
     return null;
   }
 }
 
 export async function getUserFromCookieHeader(cookieHeader, db, jwtSecret) {
-  return getUserFromToken(getTokenFromCookieHeader(cookieHeader), db, jwtSecret);
+  return getUserFromToken(
+    getTokenFromCookieHeader(cookieHeader),
+    db,
+    jwtSecret,
+  );
 }
 
 export async function getUserFromReq(req, db, jwtSecret) {
-  const token = req.cookies?.token || req.headers.authorization?.replace(/^Bearer\s+/i, '');
+  const token =
+    req.cookies?.token || req.headers.authorization?.replace(/^Bearer\s+/i, "");
   return await getUserFromToken(token, db, jwtSecret);
 }

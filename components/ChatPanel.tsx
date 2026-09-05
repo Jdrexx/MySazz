@@ -1,10 +1,10 @@
 // @ts-nocheck
-'use client';
+"use client";
 
-import { useRef, useState, useEffect } from 'react';
-import { api } from './api';
+import { useRef, useState, useEffect } from "react";
+import { api } from "./api";
 
-const rtcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+const rtcConfig = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
 
 export default function ChatPanel({
   user,
@@ -22,7 +22,7 @@ export default function ChatPanel({
   callStatus,
   setCallStatus,
   inCall,
-  setInCall
+  setInCall,
 }) {
   const typingTimer = useRef(null);
   const pcRef = useRef(null);
@@ -30,13 +30,16 @@ export default function ChatPanel({
   const localStreamRef = useRef(null);
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
-  const [chatBody, setChatBody] = useState('');
+  const [chatBody, setChatBody] = useState("");
   const chatBodyRef = useRef(chatBody);
   chatBodyRef.current = chatBody;
 
   async function startLocalMedia() {
     if (localStreamRef.current) return localStreamRef.current;
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true,
+    });
     localStreamRef.current = stream;
     if (localVideoRef.current) localVideoRef.current.srcObject = stream;
     return stream;
@@ -46,12 +49,18 @@ export default function ChatPanel({
     pcRef.current?.close();
     const pc = new RTCPeerConnection(rtcConfig);
     pc.onicecandidate = (event) => {
-      if (event.candidate) socketRef.current?.emit('webrtc:ice-candidate', { recipientId, candidate: event.candidate });
+      if (event.candidate)
+        socketRef.current?.emit("webrtc:ice-candidate", {
+          recipientId,
+          candidate: event.candidate,
+        });
     };
     pc.ontrack = (event) => {
-      if (remoteVideoRef.current && event.streams[0]) remoteVideoRef.current.srcObject = event.streams[0];
+      if (remoteVideoRef.current && event.streams[0])
+        remoteVideoRef.current.srcObject = event.streams[0];
     };
-    pc.onconnectionstatechange = () => setCallStatus(`Call ${pc.connectionState}`);
+    pc.onconnectionstatechange = () =>
+      setCallStatus(`Call ${pc.connectionState}`);
     pcRef.current = pc;
     return pc;
   }
@@ -76,13 +85,19 @@ export default function ChatPanel({
 
   async function startVideoCall() {
     if (!chatPeer?.id) {
-      setCallStatus('Open a message thread before starting a video call.');
+      setCallStatus("Open a message thread before starting a video call.");
       return;
     }
     try {
       setCallStatus(`Calling @${chatPeer.username}...`);
-      const ack = await new Promise((resolve) => socketRef.current?.emit('video:call', { recipientId: chatPeer.id }, resolve));
-      if (!ack?.ok) throw new Error(ack?.error || 'Could not start call');
+      const ack = await new Promise((resolve) =>
+        socketRef.current?.emit(
+          "video:call",
+          { recipientId: chatPeer.id },
+          resolve,
+        ),
+      );
+      if (!ack?.ok) throw new Error(ack?.error || "Could not start call");
       await preparePeer(chatPeer.id);
       pendingRecipientRef.current = chatPeer.id;
       setCallStatus(`Waiting for @${chatPeer.username} to accept...`);
@@ -99,7 +114,7 @@ export default function ChatPanel({
       setChatPeer(incomingCall);
       setCallStatus(`Accepted @${incomingCall.username}. Connecting...`);
       await preparePeer(incomingCall.id);
-      socketRef.current?.emit('video:accept', { recipientId: incomingCall.id });
+      socketRef.current?.emit("video:accept", { recipientId: incomingCall.id });
       setIncomingCall(null);
     } catch (err) {
       setCallStatus(err.message);
@@ -107,18 +122,20 @@ export default function ChatPanel({
   }
 
   function rejectVideoCall() {
-    if (incomingCall?.id) socketRef.current?.emit('video:reject', { recipientId: incomingCall.id });
+    if (incomingCall?.id)
+      socketRef.current?.emit("video:reject", { recipientId: incomingCall.id });
     setIncomingCall(null);
-    setCallStatus('Call rejected');
+    setCallStatus("Call rejected");
   }
 
   function endVideoCall(notify = true) {
     const recipientId = chatPeer?.id || incomingCall?.id;
-    if (notify && recipientId) socketRef.current?.emit('video:end', { recipientId });
+    if (notify && recipientId)
+      socketRef.current?.emit("video:end", { recipientId });
     cleanupCall();
     setInCall(false);
     setIncomingCall(null);
-    setCallStatus('Idle');
+    setCallStatus("Idle");
   }
 
   async function openThread(username = chatUser) {
@@ -134,24 +151,30 @@ export default function ChatPanel({
     const body = chatBodyRef.current;
     if (!body || !chatUser) return;
     const data = await api(`/api/messages/${encodeURIComponent(chatUser)}`, {
-      method: 'POST',
-      body: JSON.stringify({ body })
+      method: "POST",
+      body: JSON.stringify({ body }),
     });
     setMessages((prev) => [...prev, data.message]);
-    setChatBody('');
+    setChatBody("");
   }
 
   async function reportMessage(message) {
     try {
-      await api(`/api/reports/messages/${message.id}`, { method: 'POST', body: JSON.stringify({ reason: 'Member requested a safety review of this message' }) });
-      setCallStatus('Message sent to the MySazz safety team for review.');
+      await api(`/api/reports/messages/${message.id}`, {
+        method: "POST",
+        body: JSON.stringify({
+          reason: "Member requested a safety review of this message",
+        }),
+      });
+      setCallStatus("Message sent to the MySazz safety team for review.");
     } catch (error) {
       setCallStatus(error.message);
     }
   }
 
   useEffect(() => {
-    if (chatUser) openThread(chatUser).catch((error) => setCallStatus(error.message));
+    if (chatUser)
+      openThread(chatUser).catch((error) => setCallStatus(error.message));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatUser]);
 
@@ -161,28 +184,31 @@ export default function ChatPanel({
     if (!socket) return;
 
     const handlers = {
-      'video:incoming': ({ caller }) => {
+      "video:incoming": ({ caller }) => {
         setIncomingCall(caller);
         setCallStatus(`Incoming video call from @${caller.username}`);
       },
-      'video:accepted': async ({ by }) => {
+      "video:accepted": async ({ by }) => {
         setCallStatus(`@${by.username} accepted. Connecting...`);
         const recipientId = pendingRecipientRef.current || by.id;
         if (pcRef.current && recipientId) {
           const offer = await pcRef.current.createOffer();
           await pcRef.current.setLocalDescription(offer);
-          socket.emit('webrtc:offer', { recipientId, description: pcRef.current.localDescription });
+          socket.emit("webrtc:offer", {
+            recipientId,
+            description: pcRef.current.localDescription,
+          });
         }
       },
-      'video:rejected': ({ by }) => {
+      "video:rejected": ({ by }) => {
         setCallStatus(`@${by.username} rejected the call`);
         endVideoCall(false);
       },
-      'video:ended': ({ by }) => {
+      "video:ended": ({ by }) => {
         setCallStatus(`Call ended by @${by.username}`);
         endVideoCall(false);
       },
-      'webrtc:offer': async ({ from, description }) => {
+      "webrtc:offer": async ({ from, description }) => {
         try {
           setChatUser(from.username);
           setChatPeer(from);
@@ -191,18 +217,23 @@ export default function ChatPanel({
           await pc.setRemoteDescription(description);
           const answer = await pc.createAnswer();
           await pc.setLocalDescription(answer);
-          socket.emit('webrtc:answer', { recipientId: from.id, description: pc.localDescription });
+          socket.emit("webrtc:answer", {
+            recipientId: from.id,
+            description: pc.localDescription,
+          });
         } catch (err) {
           setCallStatus(err.message);
         }
       },
-      'webrtc:answer': async ({ description }) => {
-        if (pcRef.current && description) await pcRef.current.setRemoteDescription(description);
-        setCallStatus('Video call connected');
+      "webrtc:answer": async ({ description }) => {
+        if (pcRef.current && description)
+          await pcRef.current.setRemoteDescription(description);
+        setCallStatus("Video call connected");
       },
-      'webrtc:ice-candidate': async ({ candidate }) => {
-        if (pcRef.current && candidate) await pcRef.current.addIceCandidate(candidate).catch(() => null);
-      }
+      "webrtc:ice-candidate": async ({ candidate }) => {
+        if (pcRef.current && candidate)
+          await pcRef.current.addIceCandidate(candidate).catch(() => null);
+      },
     };
 
     for (const [event, handler] of Object.entries(handlers)) {
@@ -219,12 +250,29 @@ export default function ChatPanel({
   return (
     <section className="card chatPanel">
       <h2>Private conversation</h2>
-      <p className="status">{chatPeer ? `Connected with @${chatPeer.username}` : 'Choose an accepted connection to begin messaging or video chat.'}</p>
+      <p className="status">
+        {chatPeer
+          ? `Connected with @${chatPeer.username}`
+          : "Choose an accepted connection to begin messaging or video chat."}
+      </p>
       <div className="messages">
         {messages.map((m) => (
-          <div key={m.id} className={`messageBubble ${m.sender_id === user.id ? 'mine' : ''}`}>
-            <p><b>{m.sender_username}:</b> {m.body}</p>
-            {m.sender_id !== user.id && <button type="button" className="textButton" onClick={() => reportMessage(m)}>Report</button>}
+          <div
+            key={m.id}
+            className={`messageBubble ${m.sender_id === user.id ? "mine" : ""}`}
+          >
+            <p>
+              <b>{m.sender_username}:</b> {m.body}
+            </p>
+            {m.sender_id !== user.id && (
+              <button
+                type="button"
+                className="textButton"
+                onClick={() => reportMessage(m)}
+              >
+                Report
+              </button>
+            )}
           </div>
         ))}
         <span className="typing">{typing}</span>
@@ -236,11 +284,16 @@ export default function ChatPanel({
             value={chatBody}
             onChange={(e) => {
               setChatBody(e.target.value);
-              socketRef.current?.emit('typing:start', { recipientId: chatPeer?.id });
+              socketRef.current?.emit("typing:start", {
+                recipientId: chatPeer?.id,
+              });
               clearTimeout(typingTimer.current);
               typingTimer.current = setTimeout(
-                () => socketRef.current?.emit('typing:stop', { recipientId: chatPeer?.id }),
-                900
+                () =>
+                  socketRef.current?.emit("typing:stop", {
+                    recipientId: chatPeer?.id,
+                  }),
+                900,
               );
             }}
           />
@@ -256,15 +309,26 @@ export default function ChatPanel({
           <div className="incomingCall">
             <strong>@{incomingCall.username} is calling</strong>
             <button onClick={acceptVideoCall}>Accept</button>
-            <button className="danger" onClick={rejectVideoCall}>Reject</button>
+            <button className="danger" onClick={rejectVideoCall}>
+              Reject
+            </button>
           </div>
         )}
         <p className="status">Video status: {callStatus}</p>
         <div className="inline">
-          <button type="button" onClick={startVideoCall} disabled={!chatPeer?.id || inCall}>
+          <button
+            type="button"
+            onClick={startVideoCall}
+            disabled={!chatPeer?.id || inCall}
+          >
             Start video call
           </button>
-          <button type="button" className="danger" onClick={() => endVideoCall()} disabled={!inCall && !incomingCall}>
+          <button
+            type="button"
+            className="danger"
+            onClick={() => endVideoCall()}
+            disabled={!inCall && !incomingCall}
+          >
             End call
           </button>
         </div>

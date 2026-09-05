@@ -1,12 +1,32 @@
 // @ts-nocheck
 export default function NavLinks() {
   const links = [
-    { href: '/about-us', label: 'Our Story', description: 'Why MySazz exists' },
-    { href: '/rules-of-conduct', label: 'Community', description: 'How we care for this space' },
-    { href: '/pricing', label: 'Membership', description: 'Plans and sponsored access' },
-    { href: '/resources', label: 'Resources', description: 'Immediate and local support' },
-    { href: '/privacy', label: 'Privacy', description: 'Your choices and protections' },
-    { href: '/contact', label: 'Contact', description: 'Questions and partnerships' }
+    { href: "/about-us", label: "Our Story", description: "Why MySazz exists" },
+    {
+      href: "/rules-of-conduct",
+      label: "Community",
+      description: "How we care for this space",
+    },
+    {
+      href: "/pricing",
+      label: "Membership",
+      description: "Plans and sponsored access",
+    },
+    {
+      href: "/resources",
+      label: "Resources",
+      description: "Immediate and local support",
+    },
+    {
+      href: "/privacy",
+      label: "Privacy",
+      description: "Your choices and protections",
+    },
+    {
+      href: "/contact",
+      label: "Contact",
+      description: "Questions and partnerships",
+    },
   ];
 
   return (

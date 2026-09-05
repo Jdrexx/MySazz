@@ -1,29 +1,29 @@
 // @ts-nocheck
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { api } from './api';
+import { useState } from "react";
+import { api } from "./api";
 
 export default function PostComposer({ onPostCreated, posts }) {
-  const [postBody, setPostBody] = useState('');
+  const [postBody, setPostBody] = useState("");
   const [media, setMedia] = useState(null);
 
   async function uploadFile(file) {
     const form = new FormData();
-    form.append('media', file);
-    const data = await api('/api/uploads', { method: 'POST', body: form });
+    form.append("media", file);
+    const data = await api("/api/uploads", { method: "POST", body: form });
     setMedia(data.media);
     return data.media;
   }
 
   async function createPost(e) {
     e.preventDefault();
-    const data = await api('/api/posts', {
-      method: 'POST',
-      body: JSON.stringify({ body: postBody, media_id: media?.id })
+    const data = await api("/api/posts", {
+      method: "POST",
+      body: JSON.stringify({ body: postBody, media_id: media?.id }),
     });
     onPostCreated([data.post, ...posts]);
-    setPostBody('');
+    setPostBody("");
     setMedia(null);
   }
 

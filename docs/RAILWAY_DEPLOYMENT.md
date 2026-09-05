@@ -104,7 +104,16 @@ Expected shape:
 ```json
 {
   "ok": true,
-  "features": ["auth", "uploads", "users", "posts", "notifications", "search", "moderation", "messages"],
+  "features": [
+    "auth",
+    "uploads",
+    "users",
+    "posts",
+    "notifications",
+    "search",
+    "moderation",
+    "messages"
+  ],
   "realtime": { "transport": "socket.io" },
   "production": true
 }

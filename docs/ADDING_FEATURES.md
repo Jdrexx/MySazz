@@ -35,29 +35,31 @@ src/features/<feature-name>/
 Then register it in `src/features/index.js`:
 
 ```js
-import { createMessagesRouter } from './messages/routes.js';
+import { createMessagesRouter } from "./messages/routes.js";
 
 export const featureRegistry = [
   // existing features...
   {
-    name: 'messages',
-    mountPath: '/api',
-    createRouter: createMessagesRouter
-  }
+    name: "messages",
+    mountPath: "/api",
+    createRouter: createMessagesRouter,
+  },
 ];
 ```
 
 A route file should export one factory that receives app dependencies:
 
 ```js
-import express from 'express';
-import { authRequired } from '../../lib/http.js';
+import express from "express";
+import { authRequired } from "../../lib/http.js";
 
 export function createMessagesRouter({ db }) {
   const router = express.Router();
 
-  router.get('/messages', authRequired, (req, res) => {
-    const messages = db.prepare('SELECT * FROM messages WHERE recipient_id = ?').all(req.user.id);
+  router.get("/messages", authRequired, (req, res) => {
+    const messages = db
+      .prepare("SELECT * FROM messages WHERE recipient_id = ?")
+      .all(req.user.id);
     res.json({ messages });
   });
 

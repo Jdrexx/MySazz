@@ -1,16 +1,21 @@
-import Database from 'better-sqlite3';
-import pg from 'pg';
+import Database from "better-sqlite3";
+import pg from "pg";
 
 /**
  * Abstract database wrapper supporting both SQLite (local/testing) and PostgreSQL (production).
  * Provides async-compatible get/all/run/transaction/exec methods.
  */
 export function createDatabase(connectionString) {
-  if (!connectionString || connectionString.startsWith('sqlite:')) {
-    const path = connectionString ? connectionString.replace(/^sqlite:/, '') : ':memory:';
+  if (!connectionString || connectionString.startsWith("sqlite:")) {
+    const path = connectionString
+      ? connectionString.replace(/^sqlite:/, "")
+      : ":memory:";
     return createSQLiteDatabase(path);
   }
-  if (connectionString.startsWith('postgres://') || connectionString.startsWith('postgresql://')) {
+  if (
+    connectionString.startsWith("postgres://") ||
+    connectionString.startsWith("postgresql://")
+  ) {
     return createPostgresDatabase(connectionString);
   }
   // DB_FILE is normally a plain filesystem path such as /data/social.sqlite.
@@ -21,11 +26,11 @@ export function createDatabase(connectionString) {
 
 function createSQLiteDatabase(dbPath) {
   const db = new Database(dbPath);
-  db.pragma('journal_mode = WAL');
-  db.pragma('foreign_keys = ON');
+  db.pragma("journal_mode = WAL");
+  db.pragma("foreign_keys = ON");
 
   return {
-    _type: 'sqlite',
+    _type: "sqlite",
     _db: db,
 
     get(sql, ...params) {
@@ -39,7 +44,10 @@ function createSQLiteDatabase(dbPath) {
     run(sql, ...params) {
       const stmt = db.prepare(sql);
       const result = stmt.run(...params);
-      return { changes: result.changes, lastInsertRowid: Number(result.lastInsertRowid) };
+      return {
+        changes: result.changes,
+        lastInsertRowid: Number(result.lastInsertRowid),
+      };
     },
 
     transaction(fn) {
@@ -52,7 +60,9 @@ function createSQLiteDatabase(dbPath) {
     },
 
     hasColumn(table, column) {
-      return (db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[]).some((row) => row.name === column);
+      return (
+        db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[]
+      ).some((row) => row.name === column);
     },
 
     addColumn(table, column, definition) {
@@ -61,7 +71,7 @@ function createSQLiteDatabase(dbPath) {
 
     close() {
       db.close();
-    }
+    },
   };
 }
 
@@ -71,7 +81,7 @@ function createPostgresDatabase(connectionString) {
   const pool = new pg.Pool({ connectionString });
 
   const impl = {
-    _type: 'postgres',
+    _type: "postgres",
     _pool: pool,
     _txClient: null as pg.PoolClient | null,
 
@@ -92,20 +102,37 @@ function createPostgresDatabase(connectionString) {
     async run(sql, ...params) {
       let queryText = sql;
       const isInsert = /^\s*INSERT/i.test(sql);
-      const tableName = /^\s*INSERT\s+INTO\s+([a-z_][a-z0-9_]*)/i.exec(sql)?.[1]?.toLowerCase();
+      const tableName = /^\s*INSERT\s+INTO\s+([a-z_][a-z0-9_]*)/i
+        .exec(sql)?.[1]
+        ?.toLowerCase();
       const tablesWithGeneratedId = new Set([
-        'users', 'media', 'posts', 'comments', 'notifications', 'auth_tokens',
-        'reports', 'messages', 'activity_log', 'user_consents', 'connections'
+        "users",
+        "media",
+        "posts",
+        "comments",
+        "notifications",
+        "auth_tokens",
+        "reports",
+        "messages",
+        "activity_log",
+        "user_consents",
+        "connections",
       ]);
-      if (isInsert && tableName && tablesWithGeneratedId.has(tableName) && !/RETURNING/i.test(sql)) {
-        queryText = sql.replace(/;\s*$/, '') + ' RETURNING id';
+      if (
+        isInsert &&
+        tableName &&
+        tablesWithGeneratedId.has(tableName) &&
+        !/RETURNING/i.test(sql)
+      ) {
+        queryText = sql.replace(/;\s*$/, "") + " RETURNING id";
       }
       const { text, values } = convertPlaceholders(queryText, params);
       const client = impl._txClient || pool;
       const result = await client.query(text, values);
       return {
         changes: result.rowCount,
-        lastInsertRowid: (result.rows[0] as { id?: number } | undefined)?.id ?? null
+        lastInsertRowid:
+          (result.rows[0] as { id?: number } | undefined)?.id ?? null,
       };
     },
 
@@ -114,12 +141,12 @@ function createPostgresDatabase(connectionString) {
         const client = await pool.connect();
         impl._txClient = client;
         try {
-          await client.query('BEGIN');
+          await client.query("BEGIN");
           const result = await fn();
-          await client.query('COMMIT');
+          await client.query("COMMIT");
           return result;
         } catch (err) {
-          await client.query('ROLLBACK');
+          await client.query("ROLLBACK");
           throw err;
         } finally {
           impl._txClient = null;
@@ -135,18 +162,20 @@ function createPostgresDatabase(connectionString) {
     async hasColumn(table, column) {
       const result = await pool.query(
         `SELECT column_name FROM information_schema.columns WHERE table_name = $1 AND column_name = $2`,
-        [table, column]
+        [table, column],
       );
       return result.rows.length > 0;
     },
 
     async addColumn(table, column, definition) {
-      await pool.query(`ALTER TABLE ${table} ADD COLUMN IF NOT EXISTS ${column} ${definition}`);
+      await pool.query(
+        `ALTER TABLE ${table} ADD COLUMN IF NOT EXISTS ${column} ${definition}`,
+      );
     },
 
     async close() {
       await pool.end();
-    }
+    },
   };
 
   return impl;

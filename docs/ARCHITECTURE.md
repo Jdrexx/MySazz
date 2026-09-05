@@ -57,11 +57,7 @@ Each registry entry has this shape:
 
 ```js
 {
-  db,
-  jwtSecret,
-  config,
-  email,
-  io
+  (db, jwtSecret, config, email, io);
 }
 ```
 
@@ -69,19 +65,19 @@ Add more shared dependencies to `context` only when needed.
 
 ## Current features
 
-| Feature | File | Routes |
-| --- | --- | --- |
-| Auth | `src/features/auth/routes.ts` | Register, login, logout, reset password, email verification, TOTP |
-| Uploads | `src/features/uploads/routes.ts` | Authenticated image/video media upload |
-| Users | `src/features/users/routes.ts` | `/api/me`, privacy profile, avatar/cover, follows, export/delete |
-| Connections | `src/features/connections/routes.ts` | Mutual connection requests, acceptance, decline, removal, and status |
-| Posts | `src/features/posts/routes.ts` | Member feed, personal feed, posts, likes, comments |
-| Notifications | `src/features/notifications/routes.ts` | List/read notifications |
-| Search | `src/features/search/routes.ts` | Privacy-aware member and post search |
-| Moderation | `src/features/moderation/routes.ts` | Reports, admin reports/users/post hiding/user suspension |
-| Messages | `src/features/messages/routes.ts` | Connection-gated encrypted messages, threads, SSE compatibility, Socket.IO emits |
-| Video calls | `src/lib/realtime.ts` + `app/page.tsx` | Connection-gated Socket.IO signaling for call invite/accept/reject/end plus WebRTC offer/answer/ICE relay |
-| Frontend | `app/page.tsx` | Next.js dashboard UI for onboarding, profiles, posts, connections, notifications, chat, and video calls |
+| Feature       | File                                   | Routes                                                                                                    |
+| ------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Auth          | `src/features/auth/routes.ts`          | Register, login, logout, reset password, email verification, TOTP                                         |
+| Uploads       | `src/features/uploads/routes.ts`       | Authenticated image/video media upload                                                                    |
+| Users         | `src/features/users/routes.ts`         | `/api/me`, privacy profile, avatar/cover, follows, export/delete                                          |
+| Connections   | `src/features/connections/routes.ts`   | Mutual connection requests, acceptance, decline, removal, and status                                      |
+| Posts         | `src/features/posts/routes.ts`         | Member feed, personal feed, posts, likes, comments                                                        |
+| Notifications | `src/features/notifications/routes.ts` | List/read notifications                                                                                   |
+| Search        | `src/features/search/routes.ts`        | Privacy-aware member and post search                                                                      |
+| Moderation    | `src/features/moderation/routes.ts`    | Reports, admin reports/users/post hiding/user suspension                                                  |
+| Messages      | `src/features/messages/routes.ts`      | Connection-gated encrypted messages, threads, SSE compatibility, Socket.IO emits                          |
+| Video calls   | `src/lib/realtime.ts` + `app/page.tsx` | Connection-gated Socket.IO signaling for call invite/accept/reject/end plus WebRTC offer/answer/ICE relay |
+| Frontend      | `app/page.tsx`                         | Next.js dashboard UI for onboarding, profiles, posts, connections, notifications, chat, and video calls   |
 
 ## Production notes
 

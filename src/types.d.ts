@@ -1,5 +1,5 @@
-import 'express';
-import 'socket.io';
+import "express";
+import "socket.io";
 
 // Augment Express Request with our custom user property
 declare global {
@@ -26,7 +26,7 @@ declare global {
 }
 
 // Augment Socket.IO Socket with our custom user property
-declare module 'socket.io' {
+declare module "socket.io" {
   interface Socket {
     user?: {
       id: number;
@@ -48,7 +48,7 @@ declare module 'socket.io' {
 }
 
 // Supertest type augmentation for async response
-declare module 'supertest' {
+declare module "supertest" {
   interface Response {
     body: any;
     headers: Record<string, any>;
@@ -56,7 +56,7 @@ declare module 'supertest' {
 }
 
 // Better-sqlite3 statement type
-declare module 'better-sqlite3' {
+declare module "better-sqlite3" {
   interface Database {
     prepare(sql: string): Statement;
   }

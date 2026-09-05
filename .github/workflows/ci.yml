@@ -24,6 +24,12 @@ jobs:
         env:
           NODE_ENV: test
 
+      - run: npm run typecheck
+
+      - run: npm audit --audit-level=high
+        env:
+          NODE_ENV: test
+
       - run: npm run frontend:build
         env:
           NEXT_PUBLIC_API_URL: http://localhost:3000
